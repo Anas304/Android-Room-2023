@@ -5,6 +5,9 @@ import com.example.roomdb.data.repository.ItemRepository
 import com.example.roomdb.data.repository.OfflineItemsRepository
 import com.example.roomdb.data.room.ItemDatabase
 
+/**
+ * App container for Dependency injection.
+ */
 interface AppContainer {
     val itemsRepository: ItemRepository
 }
