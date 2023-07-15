@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -19,13 +18,10 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.roomdb.ui.utils.ItemsTopAppBar
-import kotlinx.coroutines.launch
-import java.util.Currency
-import java.util.Locale
 import com.example.roomdb.R
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -33,9 +29,10 @@ fun ItemEntryScreen(
     navigateBack: () -> Unit,
     onNavigateUp: () -> Unit,
     canNavigateBack: Boolean = true,
+    entryViewModel: ItemEntryViewModel = viewModel()
+
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val viewmodel : ItemEntryViewModel = viewModel()
     Scaffold(
         topBar = {
             ItemsTopAppBar(
@@ -46,13 +43,17 @@ fun ItemEntryScreen(
         }
     ) { innerPadding ->
         ItemEntryBody(
-            itemUiState =  viewmodel.itemUiState,
-            onItemValueChange = {},
+            itemUiState = entryViewModel.itemUiState,
+            onItemValueChange = entryViewModel::updateUiState,
             onSaveClick = {
                 // Note: If the user rotates the screen very fast, the operation may get cancelled
                 // and the item may not be saved in the Database. This is because when config
                 // change occurs, the Activity will be recreated and the rememberCoroutineScope will
                 // be cancelled - since the scope is bound to composition.
+                          coroutineScope.launch {
+                              entryViewModel.saveItem()
+                              navigateBack()
+                          }
 
             },
             modifier = Modifier
